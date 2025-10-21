@@ -349,34 +349,6 @@ app.get("/strings", async (req, res, next) => {
 });
 
 /**
- * GET /strings/:id - Retrieves a specific string by its ID.
- *
- * @route GET /strings/:id
- * @param {string} id - The ID of the string to retrieve.
- * @returns {object} JSON response with the string data.
- * @throws {Error} If the string is not found.
- */
-app.get("/strings/:id", async (req, res, next) => {
-  try {
-    const { id } = req.params;
-    const filePath = path.join(__dirname, "signal.json");
-    const fileContent = await fs.readFile(filePath, "utf8");
-    const data = JSON.parse(fileContent);
-    const stringData = data.find((item) => item.id === id);
-    if (!stringData) {
-      return res.status(404).json({
-        status: "error",
-        message: "String not found",
-        timestamp: new Date(),
-      });
-    }
-    res.status(200).json(stringData);
-  } catch (error) {
-    next(error);
-  }
-});
-
-/**
  * GET /strings/filter-by-natural-language - Filters strings using natural language query.
  *
  * Parses a natural language query into filters and applies them to the string collection.
@@ -464,6 +436,42 @@ app.get("/strings/filter-by-natural-language", async (req, res, next) => {
         parsed_filters: parsedFilters,
       },
     });
+  } catch (error) {
+    next(error);
+  }
+});
+
+/**
+ * GET /strings/:id - Retrieves a specific string by its ID.
+ *
+ * @route GET /strings/:id
+ * @param {string} id - The ID of the string to retrieve.
+ * @returns {object} JSON response with the string data.
+ * @throws {Error} If the string is not found or ID is invalid.
+ */
+app.get("/strings/:val", async (req, res, next) => {
+  try {
+    const { val } = req.params;
+
+    if (typeof val !== "string") {
+      return res.status(400).json({
+        status: "error",
+        message: "Invalid ID: must be a string",
+        timestamp: new Date(),
+      });
+    }
+    const filePath = path.join(__dirname, "signal.json");
+    const fileContent = await fs.readFile(filePath, "utf8");
+    const data = JSON.parse(fileContent);
+    const stringData = data.find((item) => item.value === val);
+    if (!stringData) {
+      return res.status(404).json({
+        status: "error",
+        message: "String not found",
+        timestamp: new Date(),
+      });
+    }
+    res.status(200).json(stringData);
   } catch (error) {
     next(error);
   }
