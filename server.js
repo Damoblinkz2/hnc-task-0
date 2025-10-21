@@ -511,6 +511,15 @@ app.delete("/strings/:string_value", async (req, res, next) => {
   }
 });
 
+// Catch-all handler for unmatched routes (404 Not Found)
+app.use((req, res) => {
+  res.status(404).json({
+    status: "error",
+    message: "Not Found",
+    timestamp: new Date(),
+  });
+});
+
 app.listen(PORT, () => {
   console.log(`🚀 Server running at http://localhost:${PORT}`);
 });
